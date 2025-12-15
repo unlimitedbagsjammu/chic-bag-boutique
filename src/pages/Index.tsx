@@ -4,9 +4,16 @@ import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/data/products";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const Index = () => {
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = products.slice(0, 6);
 
   return (
     <Layout>
@@ -40,7 +47,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Featured Products Carousel */}
       <section className="py-24 lg:py-32">
         <div className="container-luxury">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16">
@@ -58,11 +65,23 @@ const Index = () => {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4 md:-ml-6">
+              {featuredProducts.map((product) => (
+                <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 lg:basis-1/3">
+                  <ProductCard product={product} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex -left-4 lg:-left-12 border-border hover:bg-muted" />
+            <CarouselNext className="hidden md:flex -right-4 lg:-right-12 border-border hover:bg-muted" />
+          </Carousel>
         </div>
       </section>
 
