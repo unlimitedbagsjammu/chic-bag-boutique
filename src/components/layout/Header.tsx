@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { name: "Shop", href: "/shop" },
@@ -12,6 +13,7 @@ const navLinks = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { totalItems, setIsCartOpen } = useCart();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -51,11 +53,17 @@ export function Header() {
 
           {/* Cart */}
           <div className="flex items-center gap-6">
-            <button className="relative p-2 -mr-2" aria-label="Shopping bag">
+            <button 
+              className="relative p-2 -mr-2" 
+              aria-label="Shopping bag"
+              onClick={() => setIsCartOpen(true)}
+            >
               <ShoppingBag className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center rounded-full">
-                0
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-medium flex items-center justify-center rounded-full">
+                  {totalItems}
+                </span>
+              )}
             </button>
           </div>
         </div>
