@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { AnimatedLogo } from "@/components/ui/AnimatedLogo";
 import ThemeToggle from "@/components/ThemeToggle";
+import logo from "@/assets/logo-center-final.png";
 
 const navLinks = [
   { name: "Shop", href: "/shop" },
@@ -54,7 +55,7 @@ export function Header() {
           {/* Center: Brand Image */}
           <Link to="/" className="absolute left-1/2 -translate-x-1/2 animate-reveal">
             <img
-              src="/src/assets/logo-center-final.png"
+              src={logo}
               alt="Bags Unlimited"
               className="object-contain mix-blend-multiply dark:mix-blend-screen dark:invert transition-all duration-300 h-auto w-80"
             />
