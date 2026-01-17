@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
+import { AnimatedLogo } from "@/components/ui/AnimatedLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navLinks = [
   { name: "Shop", href: "/shop" },
@@ -16,45 +18,53 @@ export function Header() {
   const { totalItems, setIsCartOpen } = useCart();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container-luxury">
-        <div className="flex items-center justify-between h-20">
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 -ml-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+    <header
+      className="fixed z-50 transition-all duration-500 ease-in-out top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl rounded-full bg-secondary/80 backdrop-blur-xl border border-white/20 shadow-2xl py-3"
+    >
+      <div className="container-luxury px-6 md:px-12">
+        <div className="flex items-center justify-between h-auto min-h-[50px] relative">
+          {/* Left Section: Logo Icon + Navigation */}
+          <div className="hidden lg:flex items-center gap-8">
+            <Link to="/" className="-ml-4">
+              <img
+                src="/logo.png"
+                alt="Bags Unlimited"
+                className="h-16 w-auto dark:invert transition-all duration-300"
+              />
+            </Link>
 
-          {/* Navigation - Desktop */}
-          <nav className="hidden lg:flex items-center gap-10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className={cn(
-                  "text-sm tracking-wide uppercase link-underline transition-colors",
-                  location.pathname === link.href
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+            <nav className="flex items-center gap-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className={cn(
+                    "text-xs tracking-[0.2em] uppercase link-underline transition-colors font-medium",
+                    location.pathname === link.href
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          {/* Logo */}
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-            <h1 className="font-serif text-2xl tracking-widest uppercase">Maison</h1>
+          {/* Center: Brand Image */}
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2 animate-reveal">
+            <img
+              src="/src/assets/logo-center-final.png"
+              alt="Bags Unlimited"
+              className="object-contain mix-blend-multiply dark:mix-blend-screen dark:invert transition-all duration-300 h-auto w-80"
+            />
           </Link>
 
-          {/* Cart */}
-          <div className="flex items-center gap-6">
-            <button 
-              className="relative p-2 -mr-2" 
+          {/* Right side - Mobile Menu + Cart */}
+          <div className="flex items-center gap-4 ml-auto lg:ml-0">
+            {/* Cart */}
+            <button
+              className="relative p-2"
               aria-label="Shopping bag"
               onClick={() => setIsCartOpen(true)}
             >
@@ -65,6 +75,18 @@ export function Header() {
                 </span>
               )}
             </button>
+
+            {/* Mobile Menu Button - Visible only on small screens */}
+            <button
+              className="lg:hidden p-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+
+            {/* Dark Mode Toggle */}
+            <ThemeToggle className="opacity-50 hover:opacity-100 transition-opacity" />
           </div>
         </div>
 

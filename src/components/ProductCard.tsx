@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="group block">
-      <Link to={`/product/${product.id}`} className="block">
+      <Link to={`/shop/${product.id}`} className="block">
         <div className="card-product-image relative overflow-hidden">
           <img
             src={product.images[0]}
@@ -32,12 +32,12 @@ export function ProductCard({ product }: ProductCardProps) {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           {product.isNew && (
-            <span className="absolute top-4 left-4 text-[10px] font-medium tracking-widest uppercase bg-background px-3 py-1">
+            <span className="absolute top-4 left-4 text-[10px] font-medium tracking-widest uppercase bg-background/95 backdrop-blur-sm text-primary px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
               New
             </span>
           )}
           {product.isBestseller && !product.isNew && (
-            <span className="absolute top-4 left-4 text-[10px] font-medium tracking-widest uppercase bg-gold-light text-foreground px-3 py-1">
+            <span className="absolute top-4 left-4 text-[10px] font-medium tracking-widest uppercase bg-background/95 backdrop-blur-sm text-primary px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
               Bestseller
             </span>
           )}
@@ -51,9 +51,9 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
       <div className="mt-5 flex items-start justify-between gap-4">
-        <Link to={`/product/${product.id}`}>
+        <Link to={`/shop/${product.id}`}>
           <h3 className="font-serif text-lg hover:text-muted-foreground transition-colors">{product.name}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">${product.price}</p>
+          <p className="mt-1 text-sm text-muted-foreground">₹{product.price}</p>
         </Link>
       </div>
     </div>

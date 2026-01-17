@@ -1,8 +1,8 @@
 import { Layout } from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import bagTote from "@/assets/bag-tote.jpg";
-import bagDuffle from "@/assets/bag-duffle.jpg";
+import bagTote from "@/assets/about-2.jpg";
+import bagDuffle from "@/assets/about-1.jpg";
 
 const About = () => {
   return (
@@ -15,12 +15,13 @@ const About = () => {
               Our Story
             </p>
             <h1 className="heading-display mb-8">
-              Crafting Beauty Since 1987
+              Crafting Quality Since 2007
             </h1>
+            <p className="text-body text-lg mb-6">
+              Founded in Jammu, India, Bags Unlimited began with a clear vision — to manufacture bags that combine durability, functionality, and refined design. What started as a focused production unit has grown into a trusted name, supplying high-quality bags to retailers and partners across India.
+            </p>
             <p className="text-body text-lg">
-              Founded in a small Florentine workshop, Maison began with a singular vision: 
-              to create leather goods of uncompromising quality that would age gracefully 
-              and become more beautiful with time.
+              Rooted in in-house manufacturing and skilled craftsmanship, every Bags Unlimited product is created using premium materials, strong fiber, and precision stitching — ensuring each bag delivers long-lasting performance and everyday reliability.
             </p>
           </div>
         </div>
@@ -29,11 +30,11 @@ const About = () => {
       {/* Image Section */}
       <section className="pb-24">
         <div className="container-luxury">
-          <div className="aspect-[21/9] overflow-hidden">
+          <div className="overflow-hidden rounded-lg">
             <img
               src={bagDuffle}
-              alt="Maison craftsmanship"
-              className="w-full h-full object-cover"
+              alt="Bags Unlimited craftsmanship"
+              className="w-full h-auto"
             />
           </div>
         </div>
@@ -48,19 +49,16 @@ const About = () => {
                 Craftsmanship
               </p>
               <h2 className="heading-section mb-8">
-                The Art of Slow Making
+                Built with Care. Made to Last.
               </h2>
               <p className="text-body mb-6">
-                In an age of mass production, we choose a different path. Each Maison bag 
-                is the work of a single artisan, who guides it from cutting table to final 
-                inspection. This process cannot be rushed—a single tote requires over 40 
-                hours of dedicated craft.
+                In a world driven by speed and mass production, Bags Unlimited focuses on precision, consistency, and quality-led manufacturing. Every bag is carefully produced in our in-house unit, where skilled craftsmen oversee each stage — from material selection to stitching and final inspection.
+              </p>
+              <p className="text-body mb-6">
+                By using high-grade fiber, premium fabrics, quality leather, and reinforced stitching, we ensure every bag meets our standards for strength, comfort, and durability. Each product is designed to perform under everyday use, delivering reliability without compromising on style.
               </p>
               <p className="text-body">
-                Our leather is sourced from the finest tanneries in Tuscany, selected for its 
-                character and longevity. We use vegetable-tanning methods that have remained 
-                unchanged for centuries, resulting in leather that develops a rich patina 
-                unique to its owner.
+                Our process combines traditional craftsmanship with modern manufacturing techniques, allowing us to maintain high quality at scale while ensuring every Bags Unlimited bag reflects attention to detail, long-lasting performance, and trusted build quality.
               </p>
             </div>
             <div className="aspect-[4/5] overflow-hidden">
@@ -87,24 +85,21 @@ const About = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-12 lg:gap-16">
             <div className="text-center">
-              <h3 className="font-serif text-xl mb-4">Timeless Design</h3>
+              <h3 className="font-serif text-xl mb-4">Purposeful Design</h3>
               <p className="text-body">
-                We create pieces meant to transcend seasons, designed to be worn for decades 
-                and passed down through generations.
+                We design bags with a clear focus on functionality, comfort, and modern style. Every detail is thoughtfully considered to ensure our products remain practical, relevant, and visually timeless across everyday use.
               </p>
             </div>
             <div className="text-center">
-              <h3 className="font-serif text-xl mb-4">Ethical Practice</h3>
+              <h3 className="font-serif text-xl mb-4">Responsible Manufacturing</h3>
               <p className="text-body">
-                Every material is responsibly sourced. Our artisans work in conditions that 
-                respect their dignity and expertise.
+                With an in-house production unit, we maintain complete control over quality, processes, and working conditions. Our manufacturing practices prioritize consistency, skilled craftsmanship, and responsible sourcing of materials.
               </p>
             </div>
             <div className="text-center">
-              <h3 className="font-serif text-xl mb-4">Lasting Quality</h3>
+              <h3 className="font-serif text-xl mb-4">Enduring Quality</h3>
               <p className="text-body">
-                We believe in buying less but better. Each piece is built to last, reducing 
-                waste and honoring resources.
+                We believe quality should last. By using premium materials, strong fiber, and precision stitching, every Bags Unlimited product is built for durability, reducing frequent replacement and ensuring long-term value.
               </p>
             </div>
           </div>
@@ -114,12 +109,12 @@ const About = () => {
       {/* CTA */}
       <section className="py-24 lg:py-32 bg-primary text-primary-foreground">
         <div className="container-luxury text-center">
-          <h2 className="heading-section mb-6">Experience Maison</h2>
+          <h2 className="heading-section mb-6">Experience Bags Unlimited</h2>
           <p className="text-lg opacity-80 mb-10 max-w-lg mx-auto">
             Discover our collection of timeless pieces, each crafted with intention and care.
           </p>
-          <Link 
-            to="/shop" 
+          <Link
+            to="/shop"
             className="btn-luxury border border-primary-foreground hover:bg-primary-foreground hover:text-primary"
           >
             Shop the Collection

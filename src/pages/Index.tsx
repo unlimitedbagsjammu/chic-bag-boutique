@@ -1,49 +1,150 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/data/products";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
+import heroSlider2 from "@/assets/hero-slider-2.png";
+import heroSlider3 from "@/assets/hero-slider-3.png";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+
 
 const Index = () => {
   const featuredProducts = products.slice(0, 6);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  const heroSlides = [
+    {
+      image: heroImage,
+      subtitle: "New Collection",
+      title: "Timeless Elegance, Artfully Crafted",
+      description: "Discover our curated collection of handcrafted leather goods, designed for those who appreciate understated luxury."
+    },
+    {
+      image: heroSlider2,
+      subtitle: "Travel in Style",
+      title: "Journey with Sophistication",
+      description: "Explore our premium luggage collection, built for the modern traveler who refuses to compromise on style or durability."
+    },
+    {
+      image: heroSlider3,
+      subtitle: "Back to School",
+      title: "Prepared for Excellence",
+      description: "Durable, stylish, and functional school bags designed to carry ambitions and essentials with ease."
+    }
+  ];
+
+  /* Using new categories subset for the home page filter */
+  const categories = ["All", "Handbags", "Tote Bags", "Luggage’s", "Laptop Bags"];
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative h-[90vh] min-h-[600px] flex items-center">
-        <div className="absolute inset-0">
-          <img
-            src={heroImage}
-            alt="Maison luxury handbag"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
+      <div className="relative">
+        <Carousel
+          setApi={setApi}
+          plugins={[
+            Autoplay({
+              delay: 8000,
+            }),
+          ]}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent>
+            {heroSlides.map((slide, index) => (
+              <CarouselItem key={index} className="relative h-[90vh] min-h-[600px]">
+                <div className="absolute inset-0">
+                  <img
+                    src={slide.image}
+                    alt={slide.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/20 to-transparent" />
+                </div>
+                <div className="container-luxury relative z-10 h-full flex items-center">
+                  <div className="max-w-xl animate-fade-in-up">
+                    <p className="text-xs font-medium tracking-[0.3em] uppercase text-muted-foreground mb-6">
+                      {slide.subtitle}
+                    </p>
+                    <h1 className="heading-display mb-6">
+                      {slide.title}
+                    </h1>
+                    <p className="text-body text-lg mb-10 max-w-md">
+                      {slide.description}
+                    </p>
+                    <Link to="/shop" className="btn-luxury-primary">
+                      Explore Collection
+                      <ArrowRight className="ml-3 w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+
+        {/* Navigation Dots */}
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2 z-20">
+          {Array.from({ length: count }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${index === current ? "bg-white scale-125" : "bg-white/30 hover:bg-white/50"
+                }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
-        <div className="container-luxury relative z-10">
-          <div className="max-w-xl animate-fade-in-up">
-            <p className="text-xs font-medium tracking-[0.3em] uppercase text-muted-foreground mb-6">
-              New Collection
-            </p>
-            <h1 className="heading-display mb-6">
-              Timeless Elegance, Artfully Crafted
-            </h1>
-            <p className="text-body text-lg mb-10 max-w-md">
-              Discover our curated collection of handcrafted leather goods, 
-              designed for those who appreciate understated luxury.
-            </p>
-            <Link to="/shop" className="btn-luxury-primary">
-              Explore Collection
-              <ArrowRight className="ml-3 w-4 h-4" />
-            </Link>
-          </div>
+      </div>
+
+      {/* Categories Section */}
+      <section className="container-custom py-24" id="collection">
+        <div className="text-center mb-16">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4 tracking-tight">The Collection</h2>
+          <div className="h-1 w-24 bg-primary mx-auto rounded-full" />
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-8 mb-16 border-b border-border/40 pb-4">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`text-lg font-medium tracking-wide transition-all duration-300 pb-4 -mb-4.5 px-2
+                ${activeCategory === category
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -65,23 +166,11 @@ const Index = () => {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4 md:-ml-6">
-              {featuredProducts.map((product) => (
-                <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 lg:basis-1/3">
-                  <ProductCard product={product} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-4 lg:-left-12 border-border hover:bg-muted" />
-            <CarouselNext className="hidden md:flex -right-4 lg:-right-12 border-border hover:bg-muted" />
-          </Carousel>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -94,16 +183,13 @@ const Index = () => {
                 Our Philosophy
               </p>
               <h2 className="heading-section mb-8">
-                Where Heritage Meets Modern Craft
+                Crafted to Last. Designed to Perform.
               </h2>
               <p className="text-body mb-6">
-                Every Maison piece begins with a single thread of intention—to create
-                objects of enduring beauty that transcend the ephemeral nature of trends.
+                Every Bags Unlimited creation begins with a clear purpose — to design bags that balance durability, functionality, and timeless style, going beyond short-lived trends.
               </p>
               <p className="text-body mb-10">
-                Our artisans, trained in time-honored techniques, bring decades of expertise
-                to each bag. From the selection of the finest leathers to the precision of
-                every stitch, we honor the art of slow craftsmanship.
+                Rooted in skilled craftsmanship and refined through modern manufacturing, our bags are made using high-grade materials, strong fiber, and precision stitching. From the careful selection of fabrics and leather to the strength of every seam, we believe in quality that lasts and performance you can rely on, every day.
               </p>
               <Link to="/about" className="btn-luxury-outline">
                 Our Story
@@ -124,7 +210,7 @@ const Index = () => {
       {/* Newsletter CTA */}
       <section className="py-24 lg:py-32">
         <div className="container-luxury text-center max-w-2xl mx-auto">
-          <h2 className="heading-section mb-6">Join the Maison World</h2>
+          <h2 className="heading-section mb-6">Join the Bags Unlimited World</h2>
           <p className="text-body mb-10">
             Be the first to discover new collections, private events, and exclusive stories from our atelier.
           </p>

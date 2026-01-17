@@ -1,5 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
-import { MapPin, Mail, Phone, Clock } from "lucide-react";
+import { MapPin, Mail, Phone, Instagram } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -24,8 +24,7 @@ const Contact = () => {
         <div className="container-luxury text-center">
           <h1 className="heading-display mb-4">Contact Us</h1>
           <p className="text-body max-w-lg mx-auto">
-            We're here to assist you. Reach out with any questions about our collection, 
-            orders, or partnerships.
+            Looking to buy in bulk or partner with us? We’d love to hear from you!
           </p>
         </div>
       </section>
@@ -37,7 +36,7 @@ const Contact = () => {
             {/* Contact Info */}
             <div>
               <h2 className="heading-section mb-12">Get in Touch</h2>
-              
+
               <div className="space-y-10">
                 <div className="flex gap-5">
                   <div className="w-12 h-12 bg-card flex items-center justify-center flex-shrink-0">
@@ -46,8 +45,7 @@ const Contact = () => {
                   <div>
                     <h3 className="font-serif text-lg mb-2">Visit Our Atelier</h3>
                     <p className="text-body">
-                      245 Fifth Avenue, Suite 1200<br />
-                      New York, NY 10016
+                      83/A-Gole Market, Gandhi Nagar, Jammu.
                     </p>
                   </div>
                 </div>
@@ -59,8 +57,7 @@ const Contact = () => {
                   <div>
                     <h3 className="font-serif text-lg mb-2">Email Us</h3>
                     <p className="text-body">
-                      General: hello@maison.com<br />
-                      Press: press@maison.com
+                      unlimitedbagsjammu@gmail.com
                     </p>
                   </div>
                 </div>
@@ -72,22 +69,28 @@ const Contact = () => {
                   <div>
                     <h3 className="font-serif text-lg mb-2">Call Us</h3>
                     <p className="text-body">
-                      +1 (212) 555-0100
+                      9186071415, 7006895341
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-5">
                   <div className="w-12 h-12 bg-card flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5" />
+                    <Instagram className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-serif text-lg mb-2">Hours</h3>
-                    <p className="text-body">
-                      Monday – Friday: 10am – 6pm<br />
-                      Saturday: 11am – 5pm<br />
-                      Sunday: Closed
+                    <h3 className="font-serif text-lg mb-2">Follow Us</h3>
+                    <p className="text-body mb-2">
+
                     </p>
+                    <a
+                      href="https://instagram.com/bagsunlimitedjammu"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline font-medium"
+                    >
+                      @bagsunlimitedjammu
+                    </a>
                   </div>
                 </div>
               </div>
@@ -96,11 +99,11 @@ const Contact = () => {
               <div className="mt-16 pt-16 border-t border-border" id="shipping">
                 <h3 className="font-serif text-xl mb-6">Shipping & Returns</h3>
                 <p className="text-body mb-4">
-                  We offer complimentary shipping on all orders within the United States. 
+                  We offer complimentary shipping on all orders within the United States.
                   International shipping rates are calculated at checkout.
                 </p>
                 <p className="text-body">
-                  Returns are accepted within 30 days of delivery for unworn items in original 
+                  Returns are accepted within 30 days of delivery for unworn items in original
                   packaging. Contact us to initiate a return.
                 </p>
               </div>
@@ -108,8 +111,8 @@ const Contact = () => {
               <div className="mt-10" id="care">
                 <h3 className="font-serif text-xl mb-6">Care Guide</h3>
                 <p className="text-body">
-                  Store your bag in the provided dust bag when not in use. Avoid prolonged 
-                  exposure to direct sunlight. Clean with a soft, dry cloth. For deeper cleaning, 
+                  Store your bag in the provided dust bag when not in use. Avoid prolonged
+                  exposure to direct sunlight. Clean with a soft, dry cloth. For deeper cleaning,
                   we recommend professional leather care services.
                 </p>
               </div>

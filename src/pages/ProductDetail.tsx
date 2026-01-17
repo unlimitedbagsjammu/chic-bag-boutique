@@ -65,7 +65,7 @@ const ProductDetail = () => {
               <h1 className="heading-display text-3xl lg:text-4xl mb-4">
                 {product.name}
               </h1>
-              <p className="text-2xl font-serif mb-8">${product.price}</p>
+              <p className="text-2xl font-serif mb-8">₹{product.price}</p>
 
               <p className="text-body mb-10 max-w-md">{product.description}</p>
 
@@ -95,7 +95,7 @@ const ProductDetail = () => {
 
               {/* Add to Cart */}
               <button className="btn-luxury-primary w-full lg:w-auto mb-8">
-                Add to Bag — ${product.price * quantity}
+                Add to Bag — ₹{product.price * quantity}
               </button>
 
               {/* Details Accordion */}
@@ -135,7 +135,7 @@ const ProductDetail = () => {
               .filter((p) => p.id !== product.id)
               .slice(0, 3)
               .map((p) => (
-                <Link key={p.id} to={`/product/${p.id}`} className="group block">
+                <Link key={p.id} to={`/shop/${p.id}`} className="group block">
                   <div className="aspect-[3/4] bg-background overflow-hidden mb-5">
                     <img
                       src={p.images[0]}
@@ -144,7 +144,7 @@ const ProductDetail = () => {
                     />
                   </div>
                   <h3 className="font-serif text-lg">{p.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">${p.price}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">₹{p.price}</p>
                 </Link>
               ))}
           </div>

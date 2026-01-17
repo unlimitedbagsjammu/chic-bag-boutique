@@ -3,16 +3,17 @@ import { useCart } from "@/context/CartContext";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export function CartSheet() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
 
+  const navigate = useNavigate();
+
   const handleCheckout = () => {
-    toast({
-      title: "Payment Gateway",
-      description: "Paytm/Google Pay integration requires backend setup. Enable Lovable Cloud to proceed.",
-    });
+    setIsCartOpen(false);
+    navigate("/checkout");
   };
 
   return (
@@ -42,7 +43,7 @@ export function CartSheet() {
                   <div className="flex-1 flex flex-col">
                     <h4 className="font-serif text-sm">{item.product.name}</h4>
                     <p className="text-sm text-muted-foreground mt-1">
-                      ${item.product.price}
+                      ₹{item.product.price}
                     </p>
                     <div className="flex items-center gap-3 mt-auto">
                       <button
@@ -73,7 +74,7 @@ export function CartSheet() {
             <div className="border-t pt-6 space-y-4">
               <div className="flex justify-between text-sm">
                 <span>Subtotal</span>
-                <span className="font-medium">${totalPrice.toFixed(2)}</span>
+                <span className="font-medium">₹{totalPrice.toLocaleString('en-IN')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
                 Shipping and taxes calculated at checkout

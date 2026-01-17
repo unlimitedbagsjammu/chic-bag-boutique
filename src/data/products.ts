@@ -1,8 +1,8 @@
-import bagTote from "@/assets/bag-tote.jpg";
+import bagTote from "@/assets/bag-clutch.jpg";
 import bagCrossbody from "@/assets/bag-crossbody.jpg";
 import bagSatchel from "@/assets/bag-satchel.jpg";
 import bagClutch from "@/assets/bag-clutch.jpg";
-import bagDuffle from "@/assets/bag-duffle.jpg";
+import bagDuffle from "@/assets/bag-bucket.jpg";
 import bagBucket from "@/assets/bag-bucket.jpg";
 
 export interface Product {
@@ -22,7 +22,7 @@ export const products: Product[] = [
     id: "classic-tote",
     name: "The Classic Tote",
     price: 495,
-    category: "Totes",
+    category: "Tote Bags",
     description: "A timeless silhouette crafted from the finest Italian leather. The perfect companion for work and weekend alike.",
     details: [
       "Premium Italian pebbled leather",
@@ -38,7 +38,7 @@ export const products: Product[] = [
     id: "mini-crossbody",
     name: "The Mini Crossbody",
     price: 345,
-    category: "Crossbody",
+    category: "Slings Bags",
     description: "Elegant simplicity in a compact form. Handcrafted with meticulous attention to detail.",
     details: [
       "Smooth calfskin leather",
@@ -54,7 +54,7 @@ export const products: Product[] = [
     id: "structured-satchel",
     name: "The Structured Satchel",
     price: 625,
-    category: "Satchels",
+    category: "Handbags",
     description: "Architectural lines meet artisanal craftsmanship. A statement piece for the discerning collector.",
     details: [
       "Box calfskin leather",
@@ -69,7 +69,7 @@ export const products: Product[] = [
     id: "evening-clutch",
     name: "The Evening Clutch",
     price: 275,
-    category: "Clutches",
+    category: "Handbags",
     description: "Understated elegance for your most memorable evenings. Crafted to make an impression.",
     details: [
       "Satin-finish leather",
@@ -85,7 +85,7 @@ export const products: Product[] = [
     id: "weekend-duffle",
     name: "The Weekend Duffle",
     price: 895,
-    category: "Travel",
+    category: "Luggage’s",
     description: "Journey in style with our signature duffle. Spacious yet refined, for the modern traveler.",
     details: [
       "Full-grain vegetable-tanned leather",
@@ -101,7 +101,7 @@ export const products: Product[] = [
     id: "bucket-bag",
     name: "The Bucket Bag",
     price: 445,
-    category: "Shoulder Bags",
+    category: "Handbags",
     description: "Contemporary elegance meets everyday functionality. A modern classic in the making.",
     details: [
       "Soft nappa leather",
@@ -114,4 +114,14 @@ export const products: Product[] = [
   }
 ];
 
-export const categories = ["All", "Totes", "Crossbody", "Satchels", "Clutches", "Travel", "Shoulder Bags"];
+export const categories = [
+  "All",
+  "Handbags",
+  "Tote Bags",
+  "ladies wallets",
+  "Laptop Bags",
+  "Slings Bags",
+  "School Bags",
+  "Luggage’s",
+  "men Wallets"
+];
