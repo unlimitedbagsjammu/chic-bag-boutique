@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Twitter } from "lucide-react";
+import { Instagram } from "lucide-react";
+import logo from "@/assets/logo-center-final.png";
 
 const footerLinks = {
   shop: [
@@ -28,7 +29,7 @@ export function Footer() {
         {/* Top Border Logo Seal - Left Aligned */}
         <div className="absolute top-0 left-30 -translate-y-1/6">
           <img
-            src="/src/assets/logo-center-final.png"
+            src={logo}
             alt="Bags Unlimited"
             className="h-48 w-auto object-contain mix-blend-multiply dark:mix-blend-screen dark:invert"
           />
