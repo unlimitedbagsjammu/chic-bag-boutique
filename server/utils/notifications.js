@@ -1,8 +1,26 @@
 const twilio = require('twilio');
 const nodemailer = require('nodemailer');
 
-const sendAdminNotifications = async (order) => {
-    // 1. WhatsApp via Twilio
+const sendOrderNotifications = async (order) => {
+    // 1. Setup Nodemailer Transporter
+    let transporter = null;
+    if (process.env.SMTP_USERNAME && process.env.SMTP_PASSWORD) {
+        try {
+            transporter = nodemailer.createTransport({
+                host: process.env.SMTP_SERVER,
+                port: process.env.SMTP_PORT,
+                secure: process.env.SMTP_PORT == 465,
+                auth: {
+                    user: process.env.SMTP_USERNAME,
+                    pass: process.env.SMTP_PASSWORD,
+                },
+            });
+        } catch (error) {
+            console.error('❌ Error setting up global transporter:', error);
+        }
+    }
+
+    // 2. WhatsApp via Twilio (Admin Only)
     if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
         try {
             const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -12,7 +30,7 @@ const sendAdminNotifications = async (order) => {
             const customerName = `${order.customer.firstName} ${order.customer.lastName}`;
             const customerContact = `${order.customer.email} | ${order.customer.phone}`;
 
-            // 1a. Send detailed free-form message to Admin (Requires an open session/Sandbox)
+            // 2a. Send detailed free-form message to Admin (Requires an open session/Sandbox)
             await client.messages.create({
                 from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
                 to: `whatsapp:${process.env.ADMIN_WHATSAPP_NUMBER}`,
@@ -27,7 +45,7 @@ const sendAdminNotifications = async (order) => {
                 mediaUrl: [order.paymentScreenshot]
             });
 
-            // 1b. Send Template-based message if SID is provided (Best for starting sessions or customer notifications)
+            // 2b. Send Template-based message if SID is provided (Best for starting sessions or customer notifications)
             if (process.env.TWILIO_CONTENT_SID) {
                 const date = new Date(order.createdAt).toLocaleDateString('en-GB');
                 const time = new Date(order.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -51,71 +69,99 @@ const sendAdminNotifications = async (order) => {
         }
     }
 
-    // 2. Email via SMTP
-    if (process.env.SMTP_USERNAME && process.env.SMTP_PASSWORD) {
+    // 3. Email via SMTP
+    if (transporter) {
+        const itemsHtml = order.items.map(item => `
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.name}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
+            </tr>
+        `).join('');
+
+        // Common HTML skeleton
+        const getEmailTemplate = (title, recipientName, introText, isForAdmin = false) => `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; color: #333;">
+                <h2 style="color: #000; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">${title}</h2>
+                <p>Hello ${recipientName},</p>
+                <p>${introText}</p>
+                
+                <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #eee;">
+                    <p style="margin: 5px 0;"><strong>Order ID:</strong> #${order.orderId}</p>
+                    <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
+                    ${isForAdmin ? `
+                        <p style="margin: 5px 0;"><strong>Customer Name:</strong> ${order.customer.firstName} ${order.customer.lastName}</p>
+                        <p style="margin: 5px 0;"><strong>Customer Phone:</strong> ${order.customer.phone}</p>
+                        <p style="margin: 5px 0;"><strong>Address:</strong> ${order.customer.address}, ${order.customer.city}, ${order.customer.state} - ${order.customer.pincode}</p>
+                    ` : ''}
+                </div>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background-color: #000; color: #fff;">
+                            <th style="padding: 12px; text-align: left;">Item</th>
+                            <th style="padding: 12px; text-align: center;">Qty</th>
+                            <th style="padding: 12px; text-align: right;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 20px; text-align: right; border-top: 2px solid #eee; pt: 10px;">
+                    <p style="margin: 5px 0; font-size: 14px; color: #666;">Subtotal: ₹${order.subtotal.toLocaleString('en-IN')}</p>
+                    <p style="margin: 5px 0; font-size: 14px; color: #666;">Shipping: ₹${order.shippingCost.toLocaleString('en-IN')}</p>
+                    <h3 style="color: #000; margin-top: 10px; font-size: 20px;">Total: ₹${order.total.toLocaleString('en-IN')}</h3>
+                </div>
+
+                ${!isForAdmin ? `
+                <div style="margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; background-color: #fcfcfc; padding: 20px;">
+                    <p style="font-size: 14px; color: #444; margin-bottom: 10px;">We are currently processing your order and will notify you once it has been shipped.</p>
+                    <p style="font-weight: bold; color: #000; font-size: 16px;">Thank you for choosing Chic Bag Boutique!</p>
+                </div>
+                ` : ''}
+                
+                <p style="margin-top: 30px; font-size: 11px; color: #999; text-align: center; font-style: italic;">
+                    This is an automated notification. Please do not reply to this email.
+                </p>
+            </div>
+        `;
+
         try {
-            const transporter = nodemailer.createTransport({
-                host: process.env.SMTP_SERVER,
-                port: process.env.SMTP_PORT,
-                secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
-                auth: {
-                    user: process.env.SMTP_USERNAME,
-                    pass: process.env.SMTP_PASSWORD,
-                },
+            // 3a. Send Email to Admin
+            await transporter.sendMail({
+                from: `"Chic Bag Boutique Admin" <${process.env.SMTP_USERNAME}>`,
+                to: process.env.ADMIN_EMAIL,
+                subject: `🚨 NEW ORDER RECEIVED: #${order.orderId}`,
+                html: getEmailTemplate(
+                    "Admin Notification",
+                    "Admin",
+                    `A new order has been placed by <strong>${order.customer.firstName} ${order.customer.lastName}</strong> (${order.customer.email}).`,
+                    true
+                ),
             });
+            console.log('✅ Admin order email sent');
 
-            const itemsHtml = order.items.map(item => `
-                <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.name}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.quantity}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${item.price}</td>
-                </tr>
-            `).join('');
-
+            // 3b. Send Email to Customer (Confirmation)
             await transporter.sendMail({
                 from: `"Chic Bag Boutique" <${process.env.SMTP_USERNAME}>`,
-                to: process.env.ADMIN_EMAIL,
-                subject: `New Order Received: ${order.orderId}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
-                        <h2 style="color: #333; text-align: center;">New Order Notification</h2>
-                        <p><strong>Order ID:</strong> ${order.orderId}</p>
-                        <p><strong>Customer:</strong> ${order.customer.firstName} ${order.customer.lastName}</p>
-                        <p><strong>Email:</strong> ${order.customer.email}</p>
-                        <p><strong>Phone:</strong> ${order.customer.phone}</p>
-                        
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                            <thead>
-                                <tr style="background-color: #f8f8f8;">
-                                    <th style="padding: 10px; text-align: left;">Item</th>
-                                    <th style="padding: 10px; text-align: left;">Qty</th>
-                                    <th style="padding: 10px; text-align: left;">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${itemsHtml}
-                            </tbody>
-                        </table>
-                        
-                        <div style="margin-top: 20px; text-align: right;">
-                            <p><strong>Subtotal:</strong> ₹${order.subtotal}</p>
-                            <p><strong>Shipping:</strong> ₹${order.shippingCost}</p>
-                            <h3 style="color: #d11;">Total Amount: ₹${order.total}</h3>
-                        </div>
-                        
-                        <p style="margin-top: 30px; font-size: 12px; color: #777;">
-                            This is an automated notification from Chic Bag Boutique.
-                        </p>
-                    </div>
-                `,
+                to: order.customer.email,
+                subject: `🛍️ Order Confirmed! - #${order.orderId}`,
+                html: getEmailTemplate(
+                    "Order Confirmation",
+                    order.customer.firstName,
+                    "Thank you for your purchase! We've received your order and payment proof. Our team is now verifying your order details."
+                ),
             });
-            console.log('✅ Email notification sent to admin');
+            console.log('✅ Customer confirmation email sent to:', order.customer.email);
+
         } catch (error) {
-            console.error('❌ Error sending Email notification:', error);
+            console.error('❌ Error sending Email notifications:', error);
         }
     }
 };
 
 module.exports = {
-    sendAdminNotifications
+    sendOrderNotifications
 };

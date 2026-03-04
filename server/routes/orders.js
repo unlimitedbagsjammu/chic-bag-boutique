@@ -4,7 +4,7 @@ const Order = require('../models/Order');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { sendAdminNotifications } = require('../utils/notifications');
+const { sendOrderNotifications } = require('../utils/notifications');
 
 // Configure Multer for order screenshots
 const storage = multer.diskStorage({
@@ -42,9 +42,9 @@ router.post('/', upload.single('screenshot'), async (req, res) => {
 
         const newOrder = await order.save();
 
-        // Trigger background notifications to admin
+        // Trigger background notifications to admin and customer
         // We don't await this to avoid delaying the response to the customer
-        sendAdminNotifications(newOrder);
+        sendOrderNotifications(newOrder);
 
         res.status(201).json(newOrder);
     } catch (error) {
