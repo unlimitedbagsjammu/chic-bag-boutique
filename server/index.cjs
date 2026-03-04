@@ -25,38 +25,33 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Connect to MongoDB once on startup or serverless container boot
-const connectDB = async () => {
-    try {
-        if (!process.env.MONGODB_URI) {
-            console.error('❌ CRITICAL: MONGODB_URI is not defined in environment variables.');
-            return;
-        }
-
-        if (mongoose.connection.readyState >= 1) {
-            return;
-        }
-
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('✅ Connected to MongoDB');
-    } catch (err) {
-        console.error('❌ MongoDB Connection Error:', err.message);
-    }
-};
-
-connectDB();
-
-// Fast-fail middleware if db is totally absent
-app.use((req, res, next) => {
+// Serverless MongoDB Connection Middleware
+// This blocks the request until the DB is connected, preventing Vercel timeout errors.
+app.use(async (req, res, next) => {
     if (!process.env.MONGODB_URI) {
         return res.status(500).json({
             error: 'Database Configuration Missing',
-            message: 'Your MONGODB_URI environment variable is not set.'
+            message: 'MONGODB_URI is not set.'
         });
     }
-    next();
-});
 
+    // Already connected
+    if (mongoose.connection.readyState >= 1) {
+        return next();
+    }
+
+    try {
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log('✅ Connected to MongoDB');
+        next();
+    } catch (err) {
+        console.error('❌ MongoDB Connection Error:', err.message);
+        res.status(500).json({
+            error: 'Database Connection Failed',
+            details: err.message
+        });
+    }
+});
 
 // Routes
 app.use('/api/products', productRoutes);
