@@ -25,36 +25,38 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// MongoDB Connection status middleware
-app.use(async (req, res, next) => {
-    // If we're already connected, move on
-    if (mongoose.connection.readyState === 1) {
-        return next();
-    }
+// Connect to MongoDB once on startup or serverless container boot
+const connectDB = async () => {
+    try {
+        if (!process.env.MONGODB_URI) {
+            console.error('❌ CRITICAL: MONGODB_URI is not defined in environment variables.');
+            return;
+        }
 
-    // Check if URI is present
+        if (mongoose.connection.readyState >= 1) {
+            return;
+        }
+
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log('✅ Connected to MongoDB');
+    } catch (err) {
+        console.error('❌ MongoDB Connection Error:', err.message);
+    }
+};
+
+connectDB();
+
+// Fast-fail middleware if db is totally absent
+app.use((req, res, next) => {
     if (!process.env.MONGODB_URI) {
-        console.error('❌ CRITICAL: MONGODB_URI is not defined');
         return res.status(500).json({
             error: 'Database Configuration Missing',
-            message: 'Your MONGODB_URI environment variable is not set on Vercel. Please add it in project settings.'
+            message: 'Your MONGODB_URI environment variable is not set.'
         });
     }
-
-    try {
-        // Connect if not connected
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('✅ Connected to MongoDB (via Middleware)');
-        next();
-    } catch (err) {
-        console.error('❌ MongoDB lazy connection error:', err.message);
-        res.status(500).json({
-            error: 'Database Connection Failed',
-            details: err.message,
-            suggestion: 'Double-check your MongoDB Atlas connection string and IP whitelist.'
-        });
-    }
+    next();
 });
+
 
 // Routes
 app.use('/api/products', productRoutes);
