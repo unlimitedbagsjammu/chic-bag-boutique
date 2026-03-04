@@ -1,14 +1,54 @@
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
-import { products } from "@/data/products";
-import { ArrowLeft, Minus, Plus } from "lucide-react";
-import { useState } from "react";
+import { getProductById, getAllProducts } from "@/lib/products";
+import { Product } from "@/data/products";
+import { ArrowLeft, Minus, Plus, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { addToCart } = useCart();
+  const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const product = products.find((p) => p.id === id);
+  useEffect(() => {
+    const fetchProductData = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const [productData, allProducts] = await Promise.all([
+          getProductById(id),
+          getAllProducts()
+        ]);
+        setProduct(productData);
+        if (productData) {
+          setRelatedProducts(allProducts.filter(p => p.id !== id).slice(0, 3));
+        }
+      } catch (error) {
+        console.error("Error fetching product details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container-luxury py-32 text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary mb-4" />
+          <p className="text-muted-foreground">Loading product details...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -41,22 +81,40 @@ const ProductDetail = () => {
         <div className="container-luxury">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
             {/* Image */}
-            <div className="aspect-[3/4] bg-card overflow-hidden">
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+            {/* Image Section */}
+            <div className="flex flex-col gap-4">
+              <div className="aspect-[3/4] bg-card overflow-hidden">
+                <img
+                  src={product.images && product.images.length > 0 ? product.images[selectedImage] || product.images[0] : "https://via.placeholder.com/400x500?text=No+Img"}
+                  alt={product.name}
+                  className="w-full h-full object-cover animate-fade-in"
+                />
+              </div>
+
+              {/* Thumbnails */}
+              {product.images && product.images.length > 1 && (
+                <div className="grid grid-cols-4 gap-4">
+                  {product.images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(idx)}
+                      className={`aspect-square overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-primary opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                    >
+                      <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Details */}
             <div className="lg:py-8">
-              {product.isNew && (
+              {product.isNewArrival && (
                 <span className="inline-block text-[10px] font-medium tracking-widest uppercase bg-card px-3 py-1 mb-6">
                   New Arrival
                 </span>
               )}
-              {product.isBestseller && !product.isNew && (
+              {product.isBestseller && !product.isNewArrival && (
                 <span className="inline-block text-[10px] font-medium tracking-widest uppercase bg-gold-light px-3 py-1 mb-6">
                   Bestseller
                 </span>
@@ -67,7 +125,16 @@ const ProductDetail = () => {
               </h1>
               <p className="text-2xl font-serif mb-8">₹{product.price}</p>
 
-              <p className="text-body mb-10 max-w-md">{product.description}</p>
+              <p className="text-body mb-6 max-w-md">{product.description}</p>
+
+              {/* Low Stock Warning */}
+              {product.stock !== undefined && product.stock > 0 && product.stock < 5 && (
+                <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-md inline-block">
+                  <p className="text-sm text-red-600 font-medium flex items-center gap-2">
+                    🔥 Hurry up, only {product.stock} pieces left!
+                  </p>
+                </div>
+              )}
 
               {/* Quantity */}
               <div className="mb-10">
@@ -94,8 +161,19 @@ const ProductDetail = () => {
               </div>
 
               {/* Add to Cart */}
-              <button className="btn-luxury-primary w-full lg:w-auto mb-8">
-                Add to Bag — ₹{product.price * quantity}
+              <button
+                onClick={() => {
+                  if (product) {
+                    addToCart(product, quantity);
+                    toast({
+                      title: "Added to bag",
+                      description: `${product.name} has been added to your shopping bag.`,
+                    });
+                  }
+                }}
+                className="btn-luxury-primary w-full lg:w-auto mb-8"
+              >
+                Add to Bag — ₹{(product.price * quantity).toLocaleString('en-IN')}
               </button>
 
               {/* Details Accordion */}
@@ -131,22 +209,19 @@ const ProductDetail = () => {
         <div className="container-luxury">
           <h2 className="heading-section text-center mb-16">You May Also Like</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {products
-              .filter((p) => p.id !== product.id)
-              .slice(0, 3)
-              .map((p) => (
-                <Link key={p.id} to={`/shop/${p.id}`} className="group block">
-                  <div className="aspect-[3/4] bg-background overflow-hidden mb-5">
-                    <img
-                      src={p.images[0]}
-                      alt={p.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <h3 className="font-serif text-lg">{p.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">₹{p.price}</p>
-                </Link>
-              ))}
+            {relatedProducts.map((p) => (
+              <Link key={p.id} to={`/shop/${p.id}`} className="group block">
+                <div className="aspect-[3/4] bg-background overflow-hidden mb-5">
+                  <img
+                    src={p.images && p.images.length > 0 ? p.images[0] : "https://via.placeholder.com/400x500?text=No+Img"}
+                    alt={p.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="font-serif text-lg">{p.name}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">₹{p.price}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

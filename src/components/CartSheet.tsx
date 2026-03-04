@@ -35,9 +35,12 @@ export function CartSheet() {
                 <div key={item.product.id} className="flex gap-4">
                   <div className="w-20 h-24 bg-muted overflow-hidden flex-shrink-0">
                     <img
-                      src={item.product.images[0]}
+                      src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : "https://via.placeholder.com/100?text=No+Img"}
                       alt={item.product.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/100?text=No+Img";
+                      }}
                     />
                   </div>
                   <div className="flex-1 flex flex-col">

@@ -27,16 +27,19 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link to={`/shop/${product.id}`} className="block">
         <div className="card-product-image relative overflow-hidden">
           <img
-            src={product.images[0]}
+            src={product.images?.[0] || "https://via.placeholder.com/400x500?text=No+Image"}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.src = "https://via.placeholder.com/400x500?text=No+Image";
+            }}
           />
-          {product.isNew && (
+          {product.isNewArrival && (
             <span className="absolute top-4 left-4 text-[10px] font-medium tracking-widest uppercase bg-background/95 backdrop-blur-sm text-primary px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
               New
             </span>
           )}
-          {product.isBestseller && !product.isNew && (
+          {product.isBestseller && !product.isNewArrival && (
             <span className="absolute top-4 left-4 text-[10px] font-medium tracking-widest uppercase bg-background/95 backdrop-blur-sm text-primary px-4 py-1.5 rounded-full border border-primary/10 shadow-sm">
               Bestseller
             </span>
@@ -53,7 +56,25 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="mt-5 flex items-start justify-between gap-4">
         <Link to={`/shop/${product.id}`}>
           <h3 className="font-serif text-lg hover:text-muted-foreground transition-colors">{product.name}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">₹{product.price}</p>
+
+          {/* Low Stock Warning */}
+          {product.stock !== undefined && product.stock > 0 && product.stock < 5 && (
+            <p className="text-[10px] text-red-600 font-medium animate-pulse mt-0.5">
+              Hurry up, only {product.stock} pieces left!
+            </p>
+          )}
+
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="font-semibold">₹{product.price}</span>
+            {product.mrp && product.mrp > product.price && (
+              <>
+                <span className="text-sm text-muted-foreground line-through">₹{product.mrp}</span>
+                <span className="text-sm text-orange-500 font-medium">
+                  ({Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF)
+                </span>
+              </>
+            )}
+          </div>
         </Link>
       </div>
     </div>

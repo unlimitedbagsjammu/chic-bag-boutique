@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/data/products";
-import { ArrowRight } from "lucide-react";
+import { getAllProducts } from "@/lib/products";
+import { Product } from "@/data/products";
+import { ArrowRight, Loader2 } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import heroSlider2 from "@/assets/hero-slider-2.png";
 import heroSlider3 from "@/assets/hero-slider-3.png";
+import about1 from "@/assets/about-1.jpg";
 import {
   Carousel,
   CarouselContent,
@@ -15,12 +17,28 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
-
 const Index = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const featuredProducts = products.slice(0, 6);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const heroSlides = [
     {
@@ -167,9 +185,20 @@ const Index = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {loading ? (
+              <div className="col-span-full text-center py-12">
+                <Loader2 className="w-10 h-10 animate-spin mx-auto text-primary mb-4" />
+                <p className="text-muted-foreground">Loading featured products...</p>
+              </div>
+            ) : featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">New collection coming soon.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -198,7 +227,7 @@ const Index = () => {
             </div>
             <div className="order-1 lg:order-2 aspect-[4/3] bg-muted relative overflow-hidden">
               <img
-                src={products[0].images[0]}
+                src={about1}
                 alt="Craftsmanship"
                 className="w-full h-full object-cover"
               />
