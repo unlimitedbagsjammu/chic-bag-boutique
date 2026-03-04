@@ -2,33 +2,24 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
-// Configure Multer for local storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const dir = 'uploads/products';
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        cb(null, dir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'product-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
+// Configure Multer for In-Memory storage (Required for Vercel Serverless)
+// This will store the image in MongoDB as a Base64 string.
+// No separate storage (like Cloudinary or local disk) is required.
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Upload image route
+// Upload image route (converts to Base64)
 router.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
-    const url = `${req.protocol}://${req.get('host')}/uploads/products/${req.file.filename}`;
-    res.json({ secure_url: url });
+
+    // Convert to Base64 Data URI
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+
+    res.json({ secure_url: dataURI });
 });
 
 // Get all products

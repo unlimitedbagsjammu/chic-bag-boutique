@@ -23,7 +23,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/products', productRoutes);
@@ -38,10 +37,17 @@ app.get('/', (req, res) => {
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('✅ Connected to MongoDB');
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
-        });
     })
     .catch(err => {
         console.error('❌ MongoDB connection error:', err);
     });
+
+// Conditionally listen for local development
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server is running locally on port ${PORT}`);
+    });
+}
+
+// Export for Vercel Serverless
+module.exports = app;

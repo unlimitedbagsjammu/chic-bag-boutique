@@ -2,25 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const { sendOrderNotifications } = require('../utils/notifications');
 
-// Configure Multer for order screenshots
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const dir = 'uploads/orders';
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        cb(null, dir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'order-screenshot-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
+// Configure Multer for In-Memory Storage (Required for Vercel Serverless)
+// This will store the screenshots in MongoDB as a Base64 string.
+// No separate storage (like Cloudinary or local disk) is required.
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Create new order
@@ -30,7 +17,11 @@ router.post('/', upload.single('screenshot'), async (req, res) => {
             return res.status(400).json({ message: 'Payment screenshot is required' });
         }
 
-        const screenshotUrl = `${req.protocol}://${req.get('host')}/uploads/orders/${req.file.filename}`;
+        // Convert to Base64 Data URI
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+
+        const screenshotUrl = dataURI; // No hardcoded localhost
 
         // Parse the order data which is sent as a stringified JSON field
         const orderData = JSON.parse(req.body.orderData);
@@ -43,7 +34,6 @@ router.post('/', upload.single('screenshot'), async (req, res) => {
         const newOrder = await order.save();
 
         // Trigger background notifications to admin and customer
-        // We don't await this to avoid delaying the response to the customer
         sendOrderNotifications(newOrder);
 
         res.status(201).json(newOrder);
