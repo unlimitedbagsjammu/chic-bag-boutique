@@ -1,5 +1,5 @@
-import API_BASE_URL_ROOT from "../config";
-const API_BASE_URL = `${API_BASE_URL_ROOT}/api/orders`;
+import API_BASE_URL from "../config/apiBaseUrl";
+const API_ORDERS_URL = `${API_BASE_URL}/api/orders`;
 
 export interface Order {
     _id: string;
@@ -32,13 +32,13 @@ export interface Order {
 }
 
 export const getAllOrders = async (): Promise<Order[]> => {
-    const response = await fetch(API_BASE_URL);
+    const response = await fetch(API_ORDERS_URL);
     if (!response.ok) throw new Error("Failed to fetch orders");
     return response.json();
 };
 
 export const updateOrderStatus = async (id: string, status: string): Promise<Order> => {
-    const response = await fetch(`${API_BASE_URL}/${id}/status`, {
+    const response = await fetch(`${API_ORDERS_URL}/${id}/status`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',

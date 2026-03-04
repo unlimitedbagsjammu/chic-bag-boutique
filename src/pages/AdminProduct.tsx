@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API_BASE_URL_ROOT from "@/config";
+import API_BASE_URL from "@/config/apiBaseUrl";
 import { Layout } from "@/components/layout/Layout";
 import { addProduct, getAllProducts, deleteProduct, deleteAllProducts, updateProduct } from "@/lib/products";
 import { useToast } from "@/hooks/use-toast";
@@ -195,7 +195,7 @@ export default function AdminProduct() {
     };
 
     // API Configuration
-    const API_BASE_URL = `${API_BASE_URL_ROOT}/api/products`;
+    const PRODUCT_API_URL = `${API_BASE_URL}/api/products`;
 
     const uploadImages = async (): Promise<string[]> => {
         if (productImages.length === 0) return ["https://via.placeholder.com/400x500?text=No+Image"];
@@ -213,7 +213,7 @@ export default function AdminProduct() {
             formData.append("file", image.file);
 
             try {
-                const response = await fetch(`${API_BASE_URL}/upload`, {
+                const response = await fetch(`${PRODUCT_API_URL}/upload`, {
                     method: "POST",
                     body: formData,
                 });

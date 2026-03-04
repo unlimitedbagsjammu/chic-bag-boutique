@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API_BASE_URL from "@/config";
+import API_BASE_URL from "@/config/apiBaseUrl";
 import { Layout } from "@/components/layout/Layout";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";

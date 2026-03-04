@@ -1,7 +1,7 @@
 import { Product } from "@/data/products";
-import API_BASE_URL_ROOT from "@/config";
+import API_BASE_URL from "../config/apiBaseUrl";
 
-const API_URL = `${API_BASE_URL_ROOT}/api/products`;
+const API_URL = `${API_BASE_URL}/api/products`;
 
 // Get all products
 export async function getAllProducts(): Promise<Product[]> {
