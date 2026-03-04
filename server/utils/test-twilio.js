@@ -25,7 +25,7 @@ async function testTwilio() {
         const freeform = await client.messages.create({
             from: `whatsapp:${from}`,
             to: `whatsapp:${to}`,
-            body: '🛍️ *Chic Bag Boutique* - This is a test message from your server! If you see this, your Twilio setup is correct.'
+            body: '🛍️ *Unlimited Bags* - This is a test message from your server! If you see this, your Twilio setup is correct.'
         });
         console.log(`✅ Success! Free-form SID: ${freeform.sid}`);
 

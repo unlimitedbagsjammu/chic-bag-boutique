@@ -53,7 +53,7 @@ export default function Checkout() {
     const downloadQr = () => {
         const link = document.createElement('a');
         link.href = paymentQr;
-        link.download = 'chic-bag-boutique-payment-qr.jpg';
+        link.download = 'unlimited-bags-payment-qr.jpg';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

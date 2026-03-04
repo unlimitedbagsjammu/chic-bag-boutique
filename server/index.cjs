@@ -59,7 +59,7 @@ app.use('/api/orders', orderRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-    res.send('Chic Bag Boutique API is running...');
+    res.send('Unlimited Bags API is running...');
 });
 
 // Global Error Handler

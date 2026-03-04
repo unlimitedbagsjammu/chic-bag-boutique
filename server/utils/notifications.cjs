@@ -118,7 +118,7 @@ const sendOrderNotifications = async (order) => {
                 ${!isForAdmin ? `
                 <div style="margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; background-color: #fcfcfc; padding: 20px;">
                     <p style="font-size: 14px; color: #444; margin-bottom: 10px;">We are currently processing your order and will notify you once it has been shipped.</p>
-                    <p style="font-weight: bold; color: #000; font-size: 16px;">Thank you for choosing Chic Bag Boutique!</p>
+                    <p style="font-weight: bold; color: #000; font-size: 16px;">Thank you for choosing Unlimited Bags!</p>
                 </div>
                 ` : ''}
                 
@@ -131,7 +131,7 @@ const sendOrderNotifications = async (order) => {
         try {
             // 3a. Send Email to Admin
             await transporter.sendMail({
-                from: `"Chic Bag Boutique Admin" <${process.env.SMTP_USERNAME}>`,
+                from: `"Unlimited Bags Admin" <${process.env.SMTP_USERNAME}>`,
                 to: process.env.ADMIN_EMAIL,
                 subject: `🚨 NEW ORDER RECEIVED: #${order.orderId}`,
                 html: getEmailTemplate(
@@ -145,7 +145,7 @@ const sendOrderNotifications = async (order) => {
 
             // 3b. Send Email to Customer (Confirmation)
             await transporter.sendMail({
-                from: `"Chic Bag Boutique" <${process.env.SMTP_USERNAME}>`,
+                from: `"Unlimited Bags" <${process.env.SMTP_USERNAME}>`,
                 to: order.customer.email,
                 subject: `🛍️ Order Confirmed! - #${order.orderId}`,
                 html: getEmailTemplate(

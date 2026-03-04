@@ -34,7 +34,7 @@ router.post('/', upload.single('screenshot'), async (req, res) => {
         const newOrder = await order.save();
 
         // Trigger background notifications to admin and customer
-        sendOrderNotifications(newOrder);
+        await sendOrderNotifications(newOrder);
 
         res.status(201).json(newOrder);
     } catch (error) {
