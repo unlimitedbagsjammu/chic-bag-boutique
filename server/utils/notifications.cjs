@@ -31,7 +31,9 @@ const sendOrderNotifications = async (order) => {
             const customerContact = `${order.customer.email} | ${order.customer.phone}`;
 
             // 2a. Send detailed free-form message to Admin
-            // NOTE: mediaUrl requires a public URL. Since we use Base64/MongoDB, we don't send the media here.
+            // We use our new endpoint to serve the Base64 image publicly for Twilio
+            const mediaUrl = `https://www.bagsunlimited.in/api/orders/${order._id}/screenshot`;
+
             await client.messages.create({
                 from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
                 to: `whatsapp:${process.env.ADMIN_WHATSAPP_NUMBER}`,
@@ -41,8 +43,8 @@ const sendOrderNotifications = async (order) => {
                     `*Contact:* ${customerContact}\n` +
                     `*Items:* ${itemsList}\n` +
                     `*Total:* ₹${order.total}\n\n` +
-                    `✅ *Payment Proof:* Recieved (Base64 stored in DB)\n\n` +
-                    `Please check the admin dashboard to view the screenshot.`,
+                    `✅ *Payment Proof:* Attached below`,
+                mediaUrl: [mediaUrl]
             });
 
             // 2b. Send Template-based message if SID is provided (Best for starting sessions or customer notifications)

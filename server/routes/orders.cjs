@@ -53,6 +53,32 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Serve the payment screenshot as a binary image (Required for Twilio mediaUrl)
+router.get('/:id/screenshot', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order || !order.paymentScreenshot) {
+            return res.status(404).send('Image not found');
+        }
+
+        // Expected format: data:image/jpeg;base64,...
+        const parts = order.paymentScreenshot.split(';');
+        if (parts.length !== 2) return res.status(400).send('Invalid image format');
+
+        const mimeType = parts[0].split(':')[1];
+        const base64Data = parts[1].split(',')[1];
+
+        const imgBuffer = Buffer.from(base64Data, 'base64');
+        res.writeHead(200, {
+            'Content-Type': mimeType,
+            'Content-Length': imgBuffer.length
+        });
+        res.end(imgBuffer);
+    } catch (error) {
+        res.status(500).send('Error retrieving image');
+    }
+});
+
 // Update order status
 router.patch('/:id/status', async (req, res) => {
     try {
