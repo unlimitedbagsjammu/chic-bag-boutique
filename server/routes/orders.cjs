@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const multer = require('multer');
-const { sendOrderNotifications } = require('../utils/notifications');
+const { sendOrderNotifications } = require('../utils/notifications.cjs');
 
 // Configure Multer for In-Memory Storage (Required for Vercel Serverless)
 // This will store the screenshots in MongoDB as a Base64 string.
