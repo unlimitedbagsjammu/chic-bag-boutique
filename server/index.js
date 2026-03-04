@@ -22,7 +22,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Routes
 app.use('/api/products', productRoutes);
@@ -33,14 +34,30 @@ app.get('/', (req, res) => {
     res.send('Chic Bag Boutique API is running...');
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log('✅ Connected to MongoDB');
-    })
-    .catch(err => {
-        console.error('❌ MongoDB connection error:', err);
-    });
+// MongoDB Connection status middleware
+app.use(async (req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        if (!process.env.MONGODB_URI) {
+            return res.status(500).json({
+                error: 'Configuration Error',
+                message: 'MONGODB_URI is missing in environment variables. Please add it to Vercel.'
+            });
+        }
+        try {
+            await mongoose.connect(process.env.MONGODB_URI);
+            console.log('✅ Connected to MongoDB (Lazy Load)');
+            next();
+        } catch (err) {
+            console.error('❌ MongoDB lazy connection error:', err);
+            res.status(500).json({ error: 'Database Connection Error', details: err.message });
+        }
+    } else {
+        next();
+    }
+});
+
+// Initial lazy connection attempt
+mongoose.connect(process.env.MONGODB_URI).catch(() => { });
 
 // Conditionally listen for local development
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
