@@ -25,15 +25,6 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Routes
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-
-// Root route
-app.get('/', (req, res) => {
-    res.send('Chic Bag Boutique API is running...');
-});
-
 // MongoDB Connection status middleware
 app.use(async (req, res, next) => {
     // If we're already connected, move on
@@ -63,6 +54,15 @@ app.use(async (req, res, next) => {
             suggestion: 'Double-check your MongoDB Atlas connection string and IP whitelist.'
         });
     }
+});
+
+// Routes
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+
+// Root route
+app.get('/', (req, res) => {
+    res.send('Chic Bag Boutique API is running...');
 });
 
 // Global Error Handler
